@@ -3,8 +3,8 @@ const Part = ({ part }) => {
       <p>
         {part.name} {part.exercises}
       </p>
-    );
-  };
+    )
+  }
   
-  export default Part;
+  export default Part
   
