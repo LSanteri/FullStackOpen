@@ -5,12 +5,11 @@ import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 
 const App = () => {
-  const [persons, setPersons] = useState([])  // Alustetaan tyhjällä taulukolla
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
-  // Haetaan alkutila palvelimelta useEffectillä
   useEffect(() => {
     axios
       .get('http://localhost:3001/persons')
@@ -23,12 +22,15 @@ const App = () => {
     event.preventDefault()
     const personExists = persons.find((person) => person.name === newName)
 
-    personExists
-      ? alert(`${newName} is already added to phonebook`)
-      : setPersons(persons.concat({ name: newName, phonenumber: newNumber }))
-    
-    setNewName('')
-    setNewNumber('')
+    personExists 
+      ? alert(`${newName} is already added to phonebook`)  
+      : axios
+          .post('http://localhost:3001/persons', { name: newName, phonenumber: newNumber })  
+          .then(response => {
+            setPersons(persons.concat(response.data))
+            setNewName('')
+            setNewNumber('')
+          })
   }
 
   const personsToShow = filter
