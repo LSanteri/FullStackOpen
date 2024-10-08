@@ -1,43 +1,45 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 
-
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', phonenumber: '040-123456' },
-    { name: 'Ada Lovelace', phonenumber: '39-44-5323523' },
-    { name: 'Dan Abramov', phonenumber: '12-43-234345' },
-    { name: 'Mary Poppendieck', phonenumber: '39-23-6423122' }
-  ]) 
+  const [persons, setPersons] = useState([])  // Alustetaan tyhjällä taulukolla
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
+  // Haetaan alkutila palvelimelta useEffectillä
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
 
-  const addNumber = (event) =>{
+  const addNumber = (event) => {
     event.preventDefault()
     const personExists = persons.find((person) => person.name === newName)
 
-    personExists 
-    ? alert(`${newName} is already added to phonebook`) 
-    : setPersons(persons.concat({ name: newName, phonenumber: newNumber}))
+    personExists
+      ? alert(`${newName} is already added to phonebook`)
+      : setPersons(persons.concat({ name: newName, phonenumber: newNumber }))
+    
     setNewName('')
     setNewNumber('')
   }
 
   const personsToShow = filter
-  ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
-  : persons;
+    ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
+    : persons
 
   const handleNameChange = (event) => {
-    console.log(event.target.value)
     setNewName(event.target.value)
   }
 
   const handlePhoneChange = (event) => {
-    console.log(event.target.value)
     setNewNumber(event.target.value)
   }
 
@@ -48,7 +50,6 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-
 
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
@@ -62,11 +63,9 @@ const App = () => {
         addNumber={addNumber}
       />
       <h3>Numbers</h3>
-      <Persons personsToShow={personsToShow}/>
+      <Persons personsToShow={personsToShow} />
     </div>
   )
-
 }
-
 
 export default App
