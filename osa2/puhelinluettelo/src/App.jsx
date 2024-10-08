@@ -22,10 +22,22 @@ const App = () => {
     event.preventDefault()
     const personExists = persons.find((person) => person.name === newName)
 
-    personExists 
-      ? alert(`${newName} is already added to phonebook`)  
-      : personService
-          .create({ name: newName, phonenumber: newNumber })  
+    personExists
+    ? window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+      ? personService
+          .update(personExists.id, { ...personExists, number: newNumber })
+          .then((response) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== personExists.id ? person : response
+              )
+            )
+            setNewName('')
+            setNewNumber('')
+          })
+      : null // If the user cancels, do nothing
+    : personService
+          .create({ name: newName, number: newNumber })  
           .then(response => {
             setPersons(persons.concat(response))
             setNewName('')
