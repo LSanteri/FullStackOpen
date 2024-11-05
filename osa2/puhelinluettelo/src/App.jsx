@@ -21,8 +21,8 @@ const App = () => {
   }, [])
 
   const addNumber = (event) => {
-    event.preventDefault();
-    const personExists = persons.find((person) => person.name === newName);
+    event.preventDefault()
+    const personExists = persons.find((person) => person.name === newName)
   
     personExists
       ? window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
@@ -33,22 +33,31 @@ const App = () => {
                 persons.map((person) =>
                   person.id !== personExists.id ? person : response
                 )
-              );
-              setAddMessage(`Updated ${newName}'s number`);
-              setTimeout(() => setAddMessage(null), 5000); // Clear message after 5 seconds
-              setNewName('');
-              setNewNumber('');
-            })
-        : null
+              )
+              setAddMessage(`Updated ${newName}'s number`)
+              setTimeout(() => setAddMessage(null), 5000)
+              setNewName('')
+              setNewNumber('')
+          })
+          .catch((error) => {
+            setAddMessage(`Error: ${newName} was already removed from the server.`)
+            setTimeout(() => setAddMessage(null), 5000)
+            setPersons(persons.filter((person) => person.id !== personExists.id))
+          })
+      : null
       : personService
           .create({ name: newName, number: newNumber })
           .then((response) => {
-            setPersons(persons.concat(response));
-            setAddMessage(`Added ${newName}`);
-            setTimeout(() => setAddMessage(null), 5000); // Clear message after 5 seconds
-            setNewName('');
-            setNewNumber('');
-          });
+            setPersons(persons.concat(response))
+            setAddMessage(`Added ${newName}`)
+            setTimeout(() => setAddMessage(null), 5000)
+            setNewName('')
+            setNewNumber('')
+          })
+          .catch((error) => {
+            setAddMessage(`Error: Could not add ${newName}. Please try again.`)
+            setTimeout(() => setAddMessage(null), 5000)
+          })
   };
   
   const deleteIt = (id) => {
@@ -56,9 +65,14 @@ const App = () => {
       personService
         .remove(id)
         .then(() => {
-          setPersons(persons.filter(person => person.id !== id));
-          setAddMessage('Deleted contact');
-          setTimeout(() => setAddMessage(null), 5000); // Clear message after 5 seconds
+          setPersons(persons.filter(person => person.id !== id))
+          setAddMessage('Deleted contact')
+          setTimeout(() => setAddMessage(null), 5000)
+        })
+        .catch(error => {
+          setAddMessage(`Error: ${person.name} was already deleted from the server.`);
+          setTimeout(() => setAddMessage(null), 5000);
+          setPersons(persons.filter(p => p.id !== id)); // Remove from state
         });
     }
   };
@@ -88,7 +102,7 @@ const App = () => {
 
       <h3>Add a new</h3>
 
-      <Message message={addMessage}/>
+      <Message message={addMessage} isError={addMessage && addMessage.startsWith('Error')} />
 
       <PersonForm
         newName={newName}
