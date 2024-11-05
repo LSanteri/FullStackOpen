@@ -7,6 +7,7 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [filteredCountries, setFilteredCountries] = useState([])
   const [search, setSearch] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   useEffect(() => {
     axios
@@ -26,6 +27,10 @@ const App = () => {
     setSearch(event.target.value)
   }
 
+  const handleShowCountry = (country) => {
+    setSelectedCountry(country)
+  }
+
   return (
     <div>
       <h1>Country Info</h1>
@@ -35,15 +40,17 @@ const App = () => {
         value={search}
         onChange={handleSearchChange}
       />
-      {filteredCountries.length > 10 ? (
-        <p>Too many matches, please refine your search.</p>
-      ) : filteredCountries.length > 1 ? (
-        <CountryList countries={filteredCountries} />
-      ) : filteredCountries.length === 1 ? (
-        <CountryDetails country={filteredCountries[0]} />
-      ) : (
-        <p>No matches found.</p>
-      )}
+    {selectedCountry ? (
+      <CountryDetails country={selectedCountry} />
+    ) : filteredCountries.length > 10 ? (
+      <p>Too many matches, please refine your search.</p>
+    ) : filteredCountries.length > 1 ? (
+      <CountryList countries={filteredCountries} onShowCountry={handleShowCountry} />
+    ) : filteredCountries.length === 1 ? (
+      <CountryDetails country={filteredCountries[0]} />
+    ) : (
+      <p>No matches found.</p>
+    )}
     </div>
   )
 }
